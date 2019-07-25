@@ -5,7 +5,7 @@ A Lincoln Network Assignment
 
 
 
-# SimpleBet Code Test
+# Lincoln Network Code Test
 
 More info on test -> [Lincoln Full-Stack Engineer Take-Home Project](https://github.com/NotASithLord/engineer-take-home-assignment)
 
