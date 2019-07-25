@@ -90,6 +90,9 @@ def process_donations():
                 sender="juzten+donordash@gmail.com",
             )
 
+        unprocessed_file.processed = True
+        unprocessed_file.save()
+
 
 manager.add_command("shell", Shell(make_context=_make_context))
 manager.add_command("db", MigrateCommand)

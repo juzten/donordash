@@ -26,4 +26,4 @@ class Donation(db.Model, ModelMixin):
         self.donation_amount = donation_amount
 
     def __repr__(self):
-        return self.filename
+        return self.donor_id
