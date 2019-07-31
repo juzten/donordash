@@ -63,7 +63,7 @@ export default {
                     }
                     formData.append("donation_file", this.donation_file, this.donation_file.name)
                     axios
-                        .post("https://ad35088f.ngrok.io/api/upload", formData)
+                        .post("https://5a2c6463.ngrok.io/api/upload", formData)
                         .then(res => {})
                         .catch(error => console.log(error))
                 } else {
