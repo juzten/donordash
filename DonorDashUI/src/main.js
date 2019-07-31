@@ -7,7 +7,7 @@ import vuetify from "./plugins/vuetify"
 Vue.config.productionTip = false
 
 const donations_api = axios.create({
-    baseURL: "https://ad35088f.ngrok.io/api/"
+    baseURL: "https://5a2c6463.ngrok.io/api/"
 })
 
 Vue.donations_api = Vue.prototype.$donations_api = donations_api
