@@ -62,10 +62,12 @@ export default {
                         formData.append("email", this.email)
                     }
                     formData.append("donation_file", this.donation_file, this.donation_file.name)
-                    axios
-                        .post("https://ad35088f.ngrok.io/api/upload", formData)
+
+                    this.$donations_api
+                        .post("upload", formData)
                         .then(res => {})
                         .catch(error => console.log(error))
+
                 } else {
                     // show file type error
                 }
