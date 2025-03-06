@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-import pandas as pd
+import csv
 from flask_script import Server, Manager, Shell, Command, Option, prompt_bool, prompt
 from flask_migrate import Migrate, MigrateCommand
 from flask import url_for
@@ -49,49 +49,70 @@ def process_donations():
 
     """
     unprocessed_files = DonationFile.query.filter_by(processed=False).all()
+
     for unprocessed_file in unprocessed_files:
         file_path = os.path.join(app.config["UPLOAD_FOLDER"], unprocessed_file.uuid_filename)
-        df = pd.read_csv(file_path)
 
-        new_donations_count = df.shape[0]
-        anonymous_donations = 0
-        new_donations_sum = df["donation_amount"].sum()
+        if os.path.isfile(file_path):
+            # Open the CSV file and read the rows
+            with open(file_path, mode='r') as file:
+                csv_reader = csv.DictReader(file)
 
-        for index, row in df.iterrows():
-            donation = Donation(donor_id=row["donor_id"], donation_amount=row["donation_amount"])
-            if not pd.isnull(row["donor_name"]):
-                donation.donor_name = row["donor_name"]
-            if not pd.isnull(row["donor_email"]):
-                donation.donor_email = row["donor_email"]
-            if not pd.isnull(row["donor_gender"]):
-                donation.donor_gender = row["donor_gender"]
-            if not pd.isnull(row["donor_address"]):
-                donation.donor_address = row["donor_address"]
-            if row.isnull().values.any():
-                donation.anonymous = True
-                anonymous_donations += row["donation_amount"]
+                # Initialize counters and sums
+                new_donations_count = 0
+                anonymous_donations = 0
+                new_donations_sum = 0.0
 
-            donation.save()
+                for row in csv_reader:
+                    new_donations_count += 1
+                    donation_amount = float(row["donation_amount"])
+                    new_donations_sum += donation_amount
 
-        anonymous_donations_percentages = round(anonymous_donations / new_donations_sum * 100, 2)
+                    # Create a Donation object from the row
+                    donation = Donation(donor_id=row["donor_id"], donation_amount=donation_amount)
 
-        if unprocessed_file.email:
-            mail.subject = "Donation File Processed"
-            mail.email = unprocessed_file.email
-            mail.new_donations_count = new_donations_count
-            mail.new_donations_sum = new_donations_sum
-            mail.anonymous_donations_percentages = anonymous_donations_percentages
-            send_email(
-                [unprocessed_file.email],
-                mail.subject,
-                "mail/submission_complete",
-                mail=mail,
-                reply_to="juzten+donordash@gmail.com",
-                sender="juzten+donordash@gmail.com",
-            )
+                    # Check and assign optional fields if they exist
+                    if row.get("donor_name"):
+                        donation.donor_name = row["donor_name"]
+                    if row.get("donor_email"):
+                        donation.donor_email = row["donor_email"]
+                    if row.get("donor_gender"):
+                        donation.donor_gender = row["donor_gender"]
+                    if row.get("donor_address"):
+                        donation.donor_address = row["donor_address"]
 
-        unprocessed_file.processed = True
-        unprocessed_file.save()
+                    # If any value is missing (None), mark the donation as anonymous
+                    if any(value == '' or value is None for value in row.values()):
+                        donation.anonymous = True
+                        anonymous_donations += donation_amount
+
+                    # Save the donation
+                    donation.save()
+
+                # Calculate the percentage of anonymous donations
+                anonymous_donations_percentage = round(anonymous_donations / new_donations_sum * 100, 2)
+
+                # If the file has an associated email, send a notification
+                if unprocessed_file.email:
+                    mail.subject = "Donation File Processed"
+                    mail.email = unprocessed_file.email
+                    mail.new_donations_count = new_donations_count
+                    mail.new_donations_sum = new_donations_sum
+                    mail.anonymous_donations_percentage = anonymous_donations_percentage
+                    send_email(
+                        [unprocessed_file.email],
+                        mail.subject,
+                        "mail/submission_complete",
+                        mail=mail,
+                        reply_to="juzten+donordash@gmail.com",
+                        sender="juzten+donordash@gmail.com",
+                    )
+
+            # Mark the file as processed
+            unprocessed_file.processed = True
+            unprocessed_file.save()
+        else:
+            print(f"Error: File not found at path: {file_path}")
 
 
 manager.add_command("shell", Shell(make_context=_make_context))
