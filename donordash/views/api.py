@@ -21,7 +21,6 @@ class ApiView(FlaskView):
     @route("/donations", methods=["GET"])
     def donations(self):
         """Get all donation records."""
-
         donations = Donation.query.all()
         donations_dicts = []
         for donation in donations:

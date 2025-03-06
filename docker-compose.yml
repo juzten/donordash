@@ -24,20 +24,22 @@ services:
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-donor_app}
       - CONFIG_FILE=${CONFIG_FILE:-config.dev}
-      - FLASK_ENV=${FLASK_ENV:-development}
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - PYTHONUNBUFFERED=1
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
       - POSTGRES_DB=${POSTGRES_DB:-donor_app}
     volumes:
       - ./config:/app/config
       - ./init-db.sh:/app/init-db.sh
+      - .:/app  # Mount entire project directory for hot reloading
     ports:
       - "5001:5000"
     depends_on:
       postgres:
         condition: service_healthy
-    command: ["/bin/bash", "/app/init-db.sh", "flask", "run", "--host=0.0.0.0"]
-
+    command: ["/bin/bash", "/app/init-db.sh", "flask", "run", "--host=0.0.0.0", "--reload"]
   scheduler:
     build:
       context: .

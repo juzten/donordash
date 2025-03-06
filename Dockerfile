@@ -31,7 +31,7 @@ RUN chmod +x ./manage.py
 EXPOSE 5000
 
 # Use an environment variable to determine config
-ENV FLASK_APP=app.py
+ENV FLASK_APP=run.py
 ENV FLASK_ENV=development
 ENV CONFIG_FILE=config.dev
 ENV ENVIRONMENT=dev
