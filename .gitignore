@@ -4,7 +4,6 @@
 .sudo_as_admin_successful
 .vagrant/
 .viminfo
-venv/
 *.DS_Store
 /.webassets-cache/*
 fabfile.py
@@ -80,3 +79,13 @@ node_modules/
 log.txt
 .vscode
 uploads/
+
+
+*$py.class
+*.so
+.env
+.venv
+ENV/
+env.bak/
+venv.bak/
+.pytest_cache/
