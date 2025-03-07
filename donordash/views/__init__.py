@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from flask import render_template
-from donordash.views.api import ApiView
+
 from donordash import db
+from donordash.views.api import ApiView
 
 __all__ = "init_views"
 

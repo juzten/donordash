@@ -5,7 +5,7 @@ from donordash import db
 
 class ModelMixin(object):
 
-    """ Mixin class for database model helper methods/attributes.
+    """Mixin class for database model helper methods/attributes.
 
     To enable these helpers on models, ensure to include this mixin with your
     class definition:
@@ -17,26 +17,22 @@ class ModelMixin(object):
         return str(self.__dict__)
 
     def save(self):
-        """ Save instance to database.
-        """
+        """Save instance to database."""
         db.session.add(self)
         db.session.commit()
 
     def delete(self):
-        """ Delete instance.
-        """
+        """Delete instance."""
         db.session.delete(self)
         db.session.commit()
 
     def deactivate(self):
-        """ Deactivate an instance and update db record.
-        """
+        """Deactivate an instance and update db record."""
         self.active = False
         self.save()
 
     def reactivate(self):
-        """ Reactivate a deactivated instance.
-        """
+        """Reactivate a deactivated instance."""
         self.active = True
         self.save()
 
@@ -49,15 +45,22 @@ class ModelMixin(object):
         from smartbook.models.history import History
 
         if update:
-            History.save_entry(self, user=user, action="{} Updated".format(self.class_name), info=info)
+            History.save_entry(
+                self, user=user, action="{} Updated".format(self.class_name), info=info
+            )
         elif delete:
-            History.save_entry(self, user=user, action="{} Deleted".format(self.class_name), delete=True)
+            History.save_entry(
+                self,
+                user=user,
+                action="{} Deleted".format(self.class_name),
+                delete=True,
+            )
         else:
-            History.save_entry(self, user=user, action="{} Created".format(self.class_name))
+            History.save_entry(
+                self, user=user, action="{} Created".format(self.class_name)
+            )
 
     @property
     def class_name(self):
-        """Shortcut for returning class name.
-
-        """
+        """Shortcut for returning class name."""
         return self.__class__.__name__

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from threading import Thread
-from flask_mail import Message
+
 from flask import render_template
-from donordash import mail
+from flask_mail import Message
+
 from config import config
-from donordash import app
+from donordash import app, mail
 
 logging_on = config.LOGGING_ON
 print_log = config.PRINTLOG

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from arrow import utcnow
+from sqlalchemy import Boolean, Column, Integer
 from sqlalchemy_utils import ArrowType
-from sqlalchemy import Column, Integer, Boolean
+
 from donordash import db
 from donordash.models import ModelMixin
 

@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from flask import jsonify
-from flask import request
-from flask_classful import FlaskView, route
 import os
 import uuid
-from donordash import csrf, app
-from donordash.models.donationfile import DonationFile
+
+from flask import jsonify, request
+from flask_classful import FlaskView, route
+
+from donordash import app, csrf
 from donordash.models.donation import Donation
+from donordash.models.donationfile import DonationFile
 
 prod = os.environ.get("ENVIRONMENT") != "dev"
 
@@ -46,12 +47,18 @@ class ApiView(FlaskView):
             email_address = request.form.get("email")
             donation_file = request.files.get("donation_file")
             donation_file_uuid_filename = "{}.{}".format(
-                str(uuid.uuid4()).replace("-", ""), donation_file.filename.rsplit(".", 1)[1].lower()
+                str(uuid.uuid4()).replace("-", ""),
+                donation_file.filename.rsplit(".", 1)[1].lower(),
             )
-            attachment_path = os.path.join(app.config["UPLOAD_FOLDER"], donation_file_uuid_filename)
+            attachment_path = os.path.join(
+                app.config["UPLOAD_FOLDER"], donation_file_uuid_filename
+            )
             donation_file.save(attachment_path)
 
-            donation_file = DonationFile(filename=donation_file.filename, uuid_filename=donation_file_uuid_filename)
+            donation_file = DonationFile(
+                filename=donation_file.filename,
+                uuid_filename=donation_file_uuid_filename,
+            )
 
             if email_address:
                 donation_file.email = email_address

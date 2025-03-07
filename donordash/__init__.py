@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import logging, os
-from flask_cors import CORS
-
-# from flask_marshmallow import Marshmallow
-from flask_wtf.csrf import CSRFProtect
-from flask import Flask
-from flask_debugtoolbar import DebugToolbarExtension
-from flask_sqlalchemy import SQLAlchemy
-from flask_mail import Mail
-from config import config
+import logging
+import os
+import warnings
 
 import requests.packages.urllib3
-import warnings
+from flask import Flask
+from flask_cors import CORS
+from flask_debugtoolbar import DebugToolbarExtension
+from flask_mail import Mail
+from flask_sqlalchemy import SQLAlchemy
+# from flask_marshmallow import Marshmallow
+from flask_wtf.csrf import CSRFProtect
+
+from config import config
+
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 requests.packages.urllib3.disable_warnings()
@@ -61,7 +63,9 @@ mail = Mail(app)
 CORS(app)
 
 if not app.debug:
-    logging.basicConfig(filename="error.log", level=logging.INFO, format="%(asctime)s %(message)s")
+    logging.basicConfig(
+        filename="error.log", level=logging.INFO, format="%(asctime)s %(message)s"
+    )
 else:
     toolbar = DebugToolbarExtension(app)
     app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
@@ -71,6 +75,6 @@ app.jinja_env.line_statement_prefix = "%"
 app.jinja_env.line_comment_prefix = "##"
 
 # register views
-from donordash.views import init_views
+from donordash.views import init_views  # noqa: E402
 
 init_views(app)
