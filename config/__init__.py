@@ -29,12 +29,11 @@ else:
 
     # Render provides Postgres URLs starting with postgres://, but SQLAlchemy
     # needs postgresql://, so we need to replace the protocol
-    if database_url and database_url.startswith('postgres://'):
-        database_url = database_url.replace('postgres://', 'postgresql://', 1)
-        DATABASE_URI = database_url
-
-    SQLALCHEMY_DATABASE_URI = database_url or 'postgresql://localhost:5432/donordash'
-    DATABASE_URI = SQLALCHEMY_DATABASE_URI
+    # if database_url and database_url.startswith('postgres://'):
+    #     database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    #     DATABASE_URI = database_url
+    DATABASE_URI = database_url
+    SQLALCHEMY_DATABASE_URI = database_url
 
     APP_SECRET_KEY = os.environ.get("APP_SECRET_KEY", "default_dev_key_not_for_production")
 
