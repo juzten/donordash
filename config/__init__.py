@@ -30,9 +30,11 @@ else:
         # Render uses postgres://, but SQLAlchemy expects postgresql://
         database_url = database_url.replace("postgres://", "postgresql://", 1)
         SQLALCHEMY_DATABASE_URI = database_url
+        DATABASE_URI = database_url
     else:
         # Fallback database URI
         SQLALCHEMY_DATABASE_URI = 'postgresql://username:password@localhost:5432/donordash'
+        DATABASE_URI = SQLALCHEMY_DATABASE_URI
         config.DEBUG = False
 
     APP_SECRET_KEY = os.environ.get("APP_SECRET_KEY", "default_dev_key_not_for_production")
