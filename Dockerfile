@@ -31,9 +31,14 @@ EXPOSE 5000
 
 # Use an environment variable to determine config
 ENV FLASK_APP=run.py
-ENV FLASK_ENV=development
-ENV CONFIG_FILE=config.dev
-ENV ENVIRONMENT=dev
+# ENV FLASK_ENV=development
+# ENV CONFIG_FILE=config.dev
+# ENV ENVIRONMENT=dev
+
+# These will be overridden at runtime when needed
+ENV FLASK_ENV=production
+ENV CONFIG_FILE=prod.py
+ENV ENVIRONMENT=production
 
 # Run the application
 CMD ["flask", "run", "--host=0.0.0.0"]

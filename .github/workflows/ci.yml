@@ -43,6 +43,9 @@ jobs:
     - name: Run tests
       run: |
         docker compose run --rm \
+          -e FLASK_ENV=testing \
+          -e CONFIG_FILE=ci.py \
+          -e ENVIRONMENT=ci \
           -e POSTGRES_HOST=postgres \
           -e POSTGRES_PORT=5432 \
           -e POSTGRES_USER=postgres \

@@ -30,6 +30,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
       - POSTGRES_DB=${POSTGRES_DB:-donor_app}
+      - ENVIRONMENT=dev
     volumes:
       - ./config:/app/config
       - ./init-db.sh:/app/init-db.sh
@@ -51,6 +52,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
       - POSTGRES_DB=${POSTGRES_DB:-donor_app}
+      - ENVIRONMENT=dev
     volumes:
       - ./config:/app/config
       - .:/app  # Mount entire project directory for hot reloading
@@ -81,6 +83,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=donor_app_test
+      # - ENVIRONMENT=test
+      - ENVIRONMENT=dev
     volumes:
       - .:/app
     # depends_on:
