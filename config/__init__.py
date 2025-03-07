@@ -38,36 +38,36 @@ else:
     APP_SECRET_KEY = os.environ.get("APP_SECRET_KEY", "default_dev_key_not_for_production")
 
     # Mail configuration
-    MAIL_USERNAME = os.environ.get("MAIL_USERNAME", "")
-    MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", "")
-    MAIL_SERVER = os.environ.get("MAIL_SERVER", "")
-    MAIL_PORT = int(os.environ.get("MAIL_PORT", "587"))
-    CATCH_ALL_EMAIL_ADDRESS = os.environ.get("CATCH_ALL_EMAIL_ADDRESS", "")
-    INVOICE_EMAIL_ADDRESS = os.environ.get("INVOICE_EMAIL_ADDRESS", "")
-    MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER", "")
-    MAIL_SUBJECT_PREFIX = os.environ.get("MAIL_SUBJECT_PREFIX", "Donor Dash")
-    MAIL_SENDER = os.environ.get("MAIL_SENDER", "")
+    config.MAIL_USERNAME = os.environ.get("MAIL_USERNAME", "")
+    config.MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", "")
+    config.MAIL_SERVER = os.environ.get("MAIL_SERVER", "")
+    config.MAIL_PORT = int(os.environ.get("MAIL_PORT", "587"))
+    config.CATCH_ALL_EMAIL_ADDRESS = os.environ.get("CATCH_ALL_EMAIL_ADDRESS", "")
+    config.INVOICE_EMAIL_ADDRESS = os.environ.get("INVOICE_EMAIL_ADDRESS", "")
+    config.MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER", "")
+    config.MAIL_SUBJECT_PREFIX = os.environ.get("MAIL_SUBJECT_PREFIX", "Donor Dash")
+    config.MAIL_SENDER = os.environ.get("MAIL_SENDER", "")
 
-    PORT = 5000
-    DEBUG = True
-    FLASK_DEBUG=1
-    LOGGING_ON = True
-    PRINTLOG = True
-    NOTIFICATIONS_ON = True
+    config.PORT = 5000
+    config.DEBUG = True
+    config.FLASK_DEBUG=1
+    config.LOGGING_ON = True
+    config.PRINTLOG = True
+    config.NOTIFICATIONS_ON = True
 
     # MAIL_USE_TLS = True
     # MAIL_USE_SSL = False
 
-    USER_ENABLE_CHANGE_PASSWORD = True  # Allow users to change their password
-    USER_ENABLE_CHANGE_USERNAME = False  # Allow users to change their username
-    USER_ENABLE_CONFIRM_EMAIL = True  # Force users to confirm their email
-    USER_ENABLE_FORGOT_PASSWORD = True  # Allow users to reset their passwords
-    USER_ENABLE_EMAIL = True  # Register with Email
-    USER_ENABLE_REGISTRATION = True  # Allow new users to register
-    USER_ENABLE_RETYPE_PASSWORD = True  # Prompt for `retype password` in:
-    USER_ENABLE_USERNAME = True  # Register and Login with username
-    USER_ENABLE_INVITATION = True
-    USER_REQUIRE_INVITATION = True
+    config.USER_ENABLE_CHANGE_PASSWORD = True  # Allow users to change their password
+    config.USER_ENABLE_CHANGE_USERNAME = False  # Allow users to change their username
+    config.USER_ENABLE_CONFIRM_EMAIL = True  # Force users to confirm their email
+    config.USER_ENABLE_FORGOT_PASSWORD = True  # Allow users to reset their passwords
+    config.USER_ENABLE_EMAIL = True  # Register with Email
+    config.USER_ENABLE_REGISTRATION = True  # Allow new users to register
+    config.USER_ENABLE_RETYPE_PASSWORD = True  # Prompt for `retype password` in:
+    config.USER_ENABLE_USERNAME = True  # Register and Login with username
+    config.USER_ENABLE_INVITATION = True
+    config.USER_REQUIRE_INVITATION = True
 
 
 
