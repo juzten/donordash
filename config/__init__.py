@@ -29,9 +29,9 @@ else:
 
     # Render provides Postgres URLs starting with postgres://, but SQLAlchemy
     # needs postgresql://, so we need to replace the protocol
-    # if database_url and database_url.startswith('postgres://'):
-    #     database_url = database_url.replace('postgres://', 'postgresql://', 1)
-    #     DATABASE_URI = database_url
+    if database_url and database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
     DATABASE_URI = database_url
     SQLALCHEMY_DATABASE_URI = database_url
 
