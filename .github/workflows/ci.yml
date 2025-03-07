@@ -36,9 +36,9 @@ jobs:
 
     - name: Run linting checks
       run: |
-        docker compose run --rm flask-api black --check /app
-        docker compose run --rm flask-api isort --check /app
-        docker compose run --rm flask-api flake8 /app
+        docker compose run --rm flask-api black --check /app/donordash
+        docker compose run --rm flask-api isort --check /app/donordash
+        docker compose run --rm flask-api flake8 /app/donordash
 
     - name: Run tests
       run: |
