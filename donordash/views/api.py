@@ -10,9 +10,6 @@ from donordash import app, csrf
 from donordash.models.donation import Donation
 from donordash.models.donationfile import DonationFile
 
-# prod = os.environ.get("ENVIRONMENT") != "dev"
-
-
 __all__ = "ApiView"
 
 
