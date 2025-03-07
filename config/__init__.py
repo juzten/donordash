@@ -25,15 +25,19 @@ else:
     # import config.prod as config  # config/prod.py
 
     # Get database URL from environment variable
-    config.database_url = os.environ.get('DATABASE_URL')
+    database_url = os.environ.get('DATABASE_URL')
+    print(f"Original DATABASE_URL: {database_url}")  # Debug output
 
     # Render provides Postgres URLs starting with postgres://, but SQLAlchemy
     # needs postgresql://, so we need to replace the protocol
-    if config.database_url and config.database_url.startswith('postgres://'):
-        config.database_url = config.database_url.replace('postgres://', 'postgresql://', 1)
+    if database_url and database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+        print(f"Modified DATABASE_URL: {database_url}")  # Debug output
 
-    config.DATABASE_URI = config.database_url
-    config.SQLALCHEMY_DATABASE_URI = config.database_url
+    config.database_url = database_url
+    config.DATABASE_URI = database_url
+    config.SQLALCHEMY_DATABASE_URI = database_url
+    print(f"Final config.SQLALCHEMY_DATABASE_URI: {config.SQLALCHEMY_DATABASE_URI}")  # Debug output
 
     config.APP_SECRET_KEY = os.environ.get("APP_SECRET_KEY", "default_dev_key_not_for_production")
 
