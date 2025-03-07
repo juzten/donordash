@@ -10,6 +10,7 @@ from flask_cors import CORS
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
+
 # from flask_marshmallow import Marshmallow
 from flask_wtf.csrf import CSRFProtect
 
