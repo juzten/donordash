@@ -24,18 +24,17 @@ else:
     # production server environment variables
     # import config.prod as config  # config/prod.py
 
-    # Get database URL from environment or use default
+    # Get database URL from environment variable
     database_url = os.environ.get('DATABASE_URL')
-    if database_url and database_url.startswith("postgres://"):
-        # Render uses postgres://, but SQLAlchemy expects postgresql://
-        database_url = database_url.replace("postgres://", "postgresql://", 1)
-        SQLALCHEMY_DATABASE_URI = database_url
+
+    # Render provides Postgres URLs starting with postgres://, but SQLAlchemy
+    # needs postgresql://, so we need to replace the protocol
+    if database_url and database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
         DATABASE_URI = database_url
-    else:
-        # Fallback database URI
-        SQLALCHEMY_DATABASE_URI = 'postgresql://username:password@localhost:5432/donordash'
-        DATABASE_URI = SQLALCHEMY_DATABASE_URI
-        config.DEBUG = False
+
+    SQLALCHEMY_DATABASE_URI = database_url or 'postgresql://localhost:5432/donordash'
+    DATABASE_URI = SQLALCHEMY_DATABASE_URI
 
     APP_SECRET_KEY = os.environ.get("APP_SECRET_KEY", "default_dev_key_not_for_production")
 
