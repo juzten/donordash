@@ -2,7 +2,7 @@
 
 from flask import jsonify
 from flask import request
-from flask_classy import FlaskView, route
+from flask_classful import FlaskView, route
 import os
 import uuid
 from donordash import csrf, app

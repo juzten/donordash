@@ -3,9 +3,9 @@
 
 import os
 import csv
-from flask_script import Server, Manager, Shell, Command, Option, prompt_bool, prompt
-from flask_migrate import Migrate, MigrateCommand
-from flask import url_for
+import click
+from flask_migrate import Migrate
+from flask import url_for, current_app
 from sqlalchemy_utils.functions import create_database, database_exists
 from donordash import db
 from donordash import app, mail
@@ -15,39 +15,28 @@ from donordash.models.donation import Donation
 from donordash.models.donationfile import DonationFile
 
 migrate = Migrate(app, db)
-manager = Manager(app)
-db_manager = Manager(usage="Perform database operations")
 
 
-def _make_context():
+# Create a shell context that adds the database and models to the shell session
+@app.shell_context_processor
+def make_shell_context():
     return dict(app=app, Donation=Donation, DonationFile=DonationFile, db=db)
 
 
-@manager.command
+@app.cli.command("create-db")
 def create_db():
     """Creates database if it doesn't exist."""
     db_uri = app.config["SQLALCHEMY_DATABASE_URI"]
     if not database_exists(db_uri):
-        print("Creating database ...")
+        click.echo("Creating database ...")
         create_database(db_uri)
-        # db.create_all()
     else:
-        print("Database already exists. Nothing to create.")
+        click.echo("Database already exists. Nothing to create.")
 
 
-@manager.command
+@app.cli.command("process-donations")
 def process_donations():
-    """Process donation files.
-    Ran by: python manange.py process_donations
-
-    get all unprocessed donationfile records
-    loop each one
-        create new donation record
-        after each donationfile is done processing
-            check for email and send notification to it
-
-
-    """
+    """Process donation files."""
     unprocessed_files = DonationFile.query.filter_by(processed=False).all()
 
     for unprocessed_file in unprocessed_files:
@@ -112,99 +101,92 @@ def process_donations():
             unprocessed_file.processed = True
             unprocessed_file.save()
         else:
-            print(f"Error: File not found at path: {file_path}")
+            click.echo(f"Error: File not found at path: {file_path}")
 
 
-manager.add_command("shell", Shell(make_context=_make_context))
-manager.add_command("db", MigrateCommand)
+@app.cli.group()
+def database():
+    """Database management commands."""
+    pass
 
 
-port = int(os.environ.get("PORT", 5000))
-manager.add_command("runserver", Server(use_debugger=True, use_reloader=True, host="0.0.0.0", port=port))
-
-
-@db_manager.command
-def drop():
-    "Drops database tables"
-    if prompt_bool("Are you sure you want to lose all your data"):
+@database.command("drop")
+def db_drop():
+    """Drops database tables"""
+    if click.confirm("Are you sure you want to lose all your data"):
         db.drop_all()
-        print("Database tables dropped!")
+        click.echo("Database tables dropped!")
 
 
-@db_manager.command
-def create(default_data=True, sample_data=False):
-    "Creates database tables from sqlalchemy models"
+@database.command("create")
+@click.option("--default-data", is_flag=True, default=True, help="Create with default data")
+@click.option("--sample-data", is_flag=True, default=False, help="Create with sample data")
+def db_create(default_data, sample_data):
+    """Creates database tables from sqlalchemy models"""
     db.configure_mappers()
     db.create_all()
-    print("Database tables created!")
+    click.echo("Database tables created!")
 
 
-@db_manager.command
-def recreate(default_data=True, sample_data=False):
-    "Recreates database tables (same as issuing 'drop' and then 'create')"
-    drop()
-    create(default_data, sample_data)
+@database.command("recreate")
+@click.option("--default-data", is_flag=True, default=True, help="Create with default data")
+@click.option("--sample-data", is_flag=True, default=False, help="Create with sample data")
+def db_recreate(default_data, sample_data):
+    """Recreates database tables (same as issuing 'drop' and then 'create')"""
+    db_drop()
+    db_create(default_data, sample_data)
 
 
-manager.add_command("database", db_manager)
-
-
-@manager.command
+@app.cli.command("init-db")
 def init_db():
-    """
-    Drops and re-creates the SQL schema
-    Ran by: python manage.py init_db
-    """
+    """Drops and re-creates the SQL schema"""
     db.drop_all()
     db.configure_mappers()
     db.create_all()
     db.session.commit()
 
 
-@manager.command
+@app.cli.command("routes")
 def routes():
-    import urllib
+    """Display all routes"""
+    import urllib.parse as urllib_parse
 
     output = []
     for rule in app.url_map.iter_rules():
         options = {}
         for arg in rule.arguments:
-            options[arg] = "[{0}]".format(arg)
+            options[arg] = f"[{arg}]"
         methods = ",".join(rule.methods)
         url = url_for(rule.endpoint, **options)
-        line = urllib.unquote("{:25s} {:25s} {}".format(rule.endpoint, methods, url))
+        line = urllib_parse.unquote(f"{rule.endpoint:25s} {methods:25s} {url}")
         output.append(line)
 
     for line in sorted(output):
-        print(line)
+        click.echo(line)
 
 
-@manager.command
+@app.cli.command("test")
 def test():
-    """Run the unit tests
-    Ran by: python manage.py test
-    """
+    """Run the unit tests"""
     import unittest
 
     tests = unittest.TestLoader().discover("tests")
     unittest.TextTestRunner(verbosity=2).run(tests)
 
 
-@manager.command
+@app.cli.command("cov")
 def cov():
+    """Runs the unit tests with coverage."""
     import coverage
     import unittest
 
-    """Runs the unit tests with coverage.
-    Ran by: python manage.py cov
-    """
     cov = coverage.coverage(branch=True, include="cis/*")
     cov.start()
     tests = unittest.TestLoader().discover("tests")
     unittest.TextTestRunner(verbosity=2).run(tests)
     cov.stop()
     cov.save()
-    print("Coverage Summary:")
+    click.echo("Coverage Summary:")
     cov.report()
     basedir = os.path.abspath(os.path.dirname(__file__))
     covdir = os.path.join(basedir, "coverage")
@@ -213,4 +195,4 @@ def cov():
 
 
 if __name__ == "__main__":
-    manager.run()
+    app.cli()

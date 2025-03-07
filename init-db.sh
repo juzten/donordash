@@ -12,10 +12,11 @@ echo "PostgreSQL is up - executing database commands"
 
 # Run database initialization commands
 echo "Creating database..."
-./manage.py create_db
+export FLASK_APP=manage.py
+flask create-db
 
 echo "Running database migrations..."
-./manage.py db upgrade
+flask db upgrade
 
 # Start the Flask application
 exec "$@"

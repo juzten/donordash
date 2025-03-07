@@ -59,8 +59,7 @@ services:
     #     condition: service_healthy
     depends_on:
       - flask-api
-    command: ["/bin/sh", "-c", "while true; do echo \"Running donation processing `date`\"; python /app/manage.py process_donations; sleep 60; done"]
-
+    command: ["/bin/sh", "-c", "while true; do echo \"Running donation processing `date`\"; cd /app && FLASK_APP=manage.py flask process-donations; sleep 60; done"]
   vue-frontend:
     build:
       context: .
@@ -89,7 +88,7 @@ services:
     #     condition: service_healthy
     depends_on:
       - flask-api
-    entrypoint: ["/bin/bash", "-c", "until PGPASSWORD=password psql -h postgres -U postgres postgres -c '\\q'; do echo 'Waiting for PostgreSQL...'; sleep 1; done && PGPASSWORD=password psql -h postgres -U postgres postgres -c 'CREATE DATABASE donor_app_test WITH OWNER postgres;' || true && ./manage.py db upgrade && python -m pytest donordash/tests"]
+    entrypoint: ["/bin/bash", "-c", "export FLASK_APP=manage.py && until PGPASSWORD=password psql -h postgres -U postgres postgres -c '\\q'; do echo 'Waiting for PostgreSQL...'; sleep 1; done && PGPASSWORD=password psql -h postgres -U postgres postgres -c 'CREATE DATABASE donor_app_test WITH OWNER postgres;' || true && flask db upgrade && python -m pytest donordash/tests"]
     command: []
 
 volumes:

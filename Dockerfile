@@ -1,4 +1,4 @@
-FROM python:3.6.15-buster
+FROM python:3.12-bullseye
 
 WORKDIR /app
 
@@ -7,7 +7,6 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     libffi-dev \
     libssl-dev \
-    python-dev \
     postgresql-client \
     cron \
     gcc \
@@ -18,7 +17,7 @@ RUN apt-get update && apt-get install -y \
 COPY pip.txt .
 
 # Install dependencies with specific version of pip and setuptools
-RUN pip install --upgrade pip==20.3.4 setuptools==44.1.1 wheel==0.37.1 && \
+RUN pip install --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r pip.txt
 
 # Copy the rest of the application

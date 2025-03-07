@@ -12,6 +12,8 @@ from flask_mail import Mail
 from config import config
 
 import requests.packages.urllib3
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 requests.packages.urllib3.disable_warnings()
 
