@@ -51,6 +51,7 @@ else:
 
     PORT = 5000
     DEBUG = True
+    FLASK_DEBUG=1
     LOGGING_ON = True
     PRINTLOG = True
     NOTIFICATIONS_ON = True
