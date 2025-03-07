@@ -15,6 +15,11 @@ if os.environ.get("ENVIRONMENT") == "dev":
         import config.dev as config  # config/dev.py
     except:
         raise EnvironmentError("Please create config/dev.py")
+elif os.environ.get('CI') == 'true':
+    try:
+        import config.ci as config  # config/ci.py
+    except:
+        raise EnvironmentError("Please create config/ci.py")
 else:
     # production server environment variables
     import config.prod as config  # config/prod.py
