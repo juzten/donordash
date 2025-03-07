@@ -25,17 +25,17 @@ else:
     # import config.prod as config  # config/prod.py
 
     # Get database URL from environment variable
-    database_url = os.environ.get('DATABASE_URL')
+    config.database_url = os.environ.get('DATABASE_URL')
 
     # Render provides Postgres URLs starting with postgres://, but SQLAlchemy
     # needs postgresql://, so we need to replace the protocol
-    if database_url and database_url.startswith('postgres://'):
-        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    if config.database_url and config.database_url.startswith('postgres://'):
+        config.database_url = config.database_url.replace('postgres://', 'postgresql://', 1)
 
-    DATABASE_URI = database_url
-    SQLALCHEMY_DATABASE_URI = database_url
+    config.DATABASE_URI = config.database_url
+    config.SQLALCHEMY_DATABASE_URI = config.database_url
 
-    APP_SECRET_KEY = os.environ.get("APP_SECRET_KEY", "default_dev_key_not_for_production")
+    config.APP_SECRET_KEY = os.environ.get("APP_SECRET_KEY", "default_dev_key_not_for_production")
 
     # Mail configuration
     config.MAIL_USERNAME = os.environ.get("MAIL_USERNAME", "")
