@@ -1,6 +1,10 @@
 # Donor Dash
 API and UI that powers Donor Dash
 
+# Donor Dashboard
+
+[![Donor Dashboard CI](https://github.com/juzten/donordash/actions/workflows/ci.yml/badge.svg)](https://github.com/juzten/donordash/actions/workflows/ci.yml)
+
 A Lincoln Network Assignment
 
 [Production Site](https://adoring-rosalind-f1f33f.netlify.com/)
