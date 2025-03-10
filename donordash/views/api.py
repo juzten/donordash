@@ -86,10 +86,12 @@ class ApiView(FlaskView):
                         # Save the donation
                         donation.save()
 
-                    # Calculate the percentage of anonymous donations
-                    anonymous_donations_percentage = round(
-                        anonymous_donations / new_donations_sum * 100, 2
-                    )
+                    if new_donations_sum > 0:
+                        anonymous_donations_percentage = round(
+                            anonymous_donations / new_donations_sum * 100, 2
+                        )
+                    else:
+                        anonymous_donations_percentage = 0  # Default when no donations
 
                     # If the file has an associated email, send a notification
                     if unprocessed_file.email:
