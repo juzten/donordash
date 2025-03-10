@@ -65,9 +65,14 @@ export default {
 
                     this.$donations_api
                         .post("upload", formData)
-                        .then(res => {})
+                        .then(res => {
+                            return this.$donations_api.post("process_donations")
+                        })
+                        .then(processRes => {
+                            // Handle the response from the process_donations endpoint if needed
+                            // console.log("Processing completed", processRes)
+                        })
                         .catch(error => console.log(error))
-
                 } else {
                     // show file type error
                 }

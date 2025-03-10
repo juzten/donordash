@@ -20,9 +20,11 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 requests.packages.urllib3.disable_warnings()
 
-app = Flask(__name__,
-          template_folder='templates',  # Make sure this path is correct
-          static_folder='static')
+app = Flask(
+    __name__,
+    template_folder="templates",  # Make sure this path is correct
+    static_folder="static",
+)
 app.secret_key = config.APP_SECRET_KEY
 app.config["SECRET_KEY"] = config.APP_SECRET_KEY
 app.config["PROPAGATE_EXCEPTIONS"] = True
