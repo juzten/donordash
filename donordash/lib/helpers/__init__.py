@@ -2,11 +2,11 @@
 
 from threading import Thread
 
-from flask import render_template
+from flask import current_app, render_template
 from flask_mail import Message
 
 from config import config
-from donordash import app, mail
+from donordash import mail
 
 logging_on = config.LOGGING_ON
 print_log = config.PRINTLOG
@@ -38,7 +38,7 @@ def send_email(to, subject, template, **kwargs):
         msg.to = to
         msg.body = render_template(template + ".txt", **kwargs)
         msg.html = render_template(template + ".html", **kwargs)
-        thr = Thread(target=send_async_email, args=[app, msg])
+        thr = Thread(target=send_async_email, args=[current_app, msg])
         thr.start()
         # mail.send(msg)
     except Exception as e:

@@ -5,36 +5,15 @@ import io
 import json
 import os
 import sys
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+from flask import current_app
 
-from donordash import app, db
+from donordash import db
 from donordash.models.donation import Donation
 from donordash.models.donationfile import DonationFile
-
-
-@pytest.fixture
-def client():
-    """Create a test client for the app."""
-    app.config["TESTING"] = True
-
-    # Create test upload folder if it doesn't exist
-    app.config["UPLOAD_FOLDER"] = "/tmp"
-
-    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
-    # app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///:memory:')
-    # app.config['SQLALCHEMY_DATABASE_URI'] = "donor_app_test"
-    app.config[
-        "SQLALCHEMY_DATABASE_URI"
-    ] = "postgresql://postgres:password@postgres:5432/donor_app_test"
-
-    with app.test_client() as client:
-        with app.app_context():
-            db.create_all()
-            yield client
-            db.session.remove()
-            db.drop_all()
 
 
 @pytest.fixture
@@ -108,7 +87,7 @@ def mock_unprocessed_files(monkeypatch):
 
 def create_csv_file(data, filename):
     """Helper function to create a CSV file with test data."""
-    filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+    filepath = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
 
     with open(filepath, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=data[0].keys())
@@ -119,7 +98,7 @@ def create_csv_file(data, filename):
 
 
 @pytest.fixture
-def sample_donations():
+def sample_donations(test_app):
     """Create sample donation data."""
     # Create donations with minimal required fields first
 
@@ -142,7 +121,7 @@ def sample_donations():
 
     donations = [donation1, donation2]
 
-    with app.app_context():
+    with test_app.app_context():
         for donation in donations:
             db.session.add(donation)
         db.session.commit()
@@ -190,31 +169,21 @@ def test_donations_endpoint_empty(client):
 
 def test_upload_endpoint_success(client, monkeypatch, tmp_path):
     """Test successful file upload to /api/upload endpoint."""
-    # Set up a temporary upload folder that actually exists
-    upload_folder = str(tmp_path)
-
-    # Use dictionary access instead of attribute access
-    app.config["UPLOAD_FOLDER"] = upload_folder
-
     # Directly mock the DonationFile class to avoid database operations
     original_donation_file = DonationFile
 
     try:
-        # Create a simple file for upload
         file_content = b"test,data"
 
-        # Make a real request with a real file
         data = {
             "email": "test@example.com",
             "donation_file": (io.BytesIO(file_content), "test.csv"),
         }
 
-        # Mock the DonationFile class using dictionary-style patching
         monkeypatch.setitem(
             sys.modules, "donordash.models.donationfile.DonationFile", MagicMock()
         )
 
-        # Make the request
         response = client.post(
             "/api/upload", data=data, content_type="multipart/form-data"
         )
@@ -225,12 +194,13 @@ def test_upload_endpoint_success(client, monkeypatch, tmp_path):
         assert result == {"Success": "File uploaded"}
 
         # Check that a file was created in the temp directory
-        files = list(tmp_path.iterdir())
-        assert len(files) > 0  # At least one file was created
+        upload_path = Path(current_app.config["UPLOAD_FOLDER"])
+        files = list(upload_path.iterdir())
+        assert len(files) > 0
 
     finally:
         # Restore the original configuration
-        app.config["UPLOAD_FOLDER"] = "/tmp"
+        current_app.config["UPLOAD_FOLDER"] = "/tmp"
         sys.modules[
             "donordash.models.donationfile.DonationFile"
         ] = original_donation_file
@@ -245,10 +215,10 @@ def test_upload_endpoint_no_file(client):
     assert result == {"error": 400, "exception": "File not uploaded"}
 
 
-def test_upload_endpoint_with_file_no_email(client, tmp_path):
+def test_upload_endpoint_with_file_no_email(test_app, client, tmp_path):
     """Test /api/upload endpoint works without an email address."""
     # Set the upload folder to our temporary directory
-    app.config["UPLOAD_FOLDER"] = str(tmp_path)
+    test_app.config["UPLOAD_FOLDER"] = str(tmp_path)
 
     # Create a test file
     file_content = b"donor_id,donor_name,amount\n123,Test User,50.00"
@@ -265,7 +235,7 @@ def test_upload_endpoint_with_file_no_email(client, tmp_path):
     assert result == {"Success": "File uploaded"}
 
     # Restore the original upload folder
-    app.config["UPLOAD_FOLDER"] = "/tmp"
+    test_app.config["UPLOAD_FOLDER"] = "/tmp"
 
 
 def test_process_donations_success(client, mock_unprocessed_files, sample_csv_data):
@@ -338,7 +308,7 @@ def test_process_donations_file_not_found(client, mock_unprocessed_files):
 def test_process_donations_invalid_csv(client, mock_unprocessed_files):
     """Test handling of malformed CSV files."""
     # Create invalid CSV file
-    filepath = os.path.join(app.config["UPLOAD_FOLDER"], "test_file1.csv")
+    filepath = os.path.join(current_app.config["UPLOAD_FOLDER"], "test_file1.csv")
     with open(filepath, "w") as f:
         f.write("This is not a valid CSV file")
 

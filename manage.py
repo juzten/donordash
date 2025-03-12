@@ -8,12 +8,14 @@ from flask_migrate import Migrate
 from flask import url_for, current_app
 from sqlalchemy_utils.functions import create_database, database_exists
 from donordash import db
-from donordash import app, mail
+from donordash import mail
+from donordash import create_app
 from donordash.lib.helpers import send_email
 
 from donordash.models.donation import Donation
 from donordash.models.donationfile import DonationFile
 
+app = create_app()
 migrate = Migrate(app, db)
 
 
@@ -163,15 +165,6 @@ def routes():
 
     for line in sorted(output):
         click.echo(line)
-
-
-@app.cli.command("test")
-def test():
-    """Run the unit tests"""
-    import unittest
-
-    tests = unittest.TestLoader().discover("tests")
-    unittest.TextTestRunner(verbosity=2).run(tests)
 
 
 @app.cli.command("cov")

@@ -4,10 +4,10 @@ import csv
 import os
 import uuid
 
-from flask import jsonify, request
+from flask import current_app, jsonify, request
 from flask_classful import FlaskView, route
 
-from donordash import app, csrf, mail
+from donordash import csrf, mail
 from donordash.lib.helpers import send_email
 from donordash.models.donation import Donation
 from donordash.models.donationfile import DonationFile
@@ -45,7 +45,7 @@ class ApiView(FlaskView):
 
         for unprocessed_file in unprocessed_files:
             file_path = os.path.join(
-                app.config["UPLOAD_FOLDER"], unprocessed_file.uuid_filename
+                current_app.config["UPLOAD_FOLDER"], unprocessed_file.uuid_filename
             )
 
             if os.path.isfile(file_path):
@@ -130,7 +130,7 @@ class ApiView(FlaskView):
                 donation_file.filename.rsplit(".", 1)[1].lower(),
             )
             attachment_path = os.path.join(
-                app.config["UPLOAD_FOLDER"], donation_file_uuid_filename
+                current_app.config["UPLOAD_FOLDER"], donation_file_uuid_filename
             )
             donation_file.save(attachment_path)
 
