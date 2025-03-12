@@ -10,6 +10,7 @@ from flask_cors import CORS
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv
 
 # from flask_marshmallow import Marshmallow
 from flask_wtf.csrf import CSRFProtect
@@ -31,39 +32,24 @@ def create_app(environment=None):
         template_folder="templates",  # Make sure this path is correct
         static_folder="static",
     )
-    app.secret_key = config.APP_SECRET_KEY
-    app.config["SECRET_KEY"] = config.APP_SECRET_KEY
-    app.config["PROPAGATE_EXCEPTIONS"] = True
-    app.config["SQLALCHEMY_DATABASE_URI"] = config.DATABASE_URI
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.debug = config.DEBUG
 
-    app.config["MAIL_USERNAME"] = config.MAIL_USERNAME
-    app.config["MAIL_PASSWORD"] = config.MAIL_PASSWORD
-    app.config["MAIL_DEFAULT_SENDER"] = config.MAIL_DEFAULT_SENDER
-    app.config["MAIL_SERVER"] = config.MAIL_SERVER
-    app.config["MAIL_PORT"] = config.MAIL_PORT
+    # set config
+    load_dotenv()
+    app_settings = environment if environment else os.getenv("APP_SETTINGS")
 
-    app.config["USER_ENABLE_CHANGE_PASSWORD"] = config.USER_ENABLE_CHANGE_PASSWORD
-    app.config["USER_ENABLE_CHANGE_USERNAME"] = config.USER_ENABLE_CHANGE_USERNAME
-    app.config["USER_ENABLE_CONFIRM_EMAIL"] = config.USER_ENABLE_CONFIRM_EMAIL
-    app.config["USER_ENABLE_FORGOT_PASSWORD"] = config.USER_ENABLE_FORGOT_PASSWORD
-    app.config["USER_ENABLE_EMAIL"] = config.USER_ENABLE_EMAIL
-    app.config["USER_ENABLE_REGISTRATION"] = config.USER_ENABLE_REGISTRATION
-    app.config["USER_ENABLE_RETYPE_PASSWORD"] = config.USER_ENABLE_RETYPE_PASSWORD
-    app.config["USER_ENABLE_USERNAME"] = config.USER_ENABLE_USERNAME
-    app.config["USER_ENABLE_INVITATION"] = True
-    app.config["USER_REQUIRE_INVITATION"] = True
-    app.config["PREFERRED_URL_SCHEME"] = "https"
-    app.config["USER_AFTER_LOGIN_ENDPOINT"] = "AdminView:index"
-    # app.config['USER_SEND_REGISTERED_EMAIL'] = config.USER_SEND_REGISTERED_EMAIL
-    app.config["UPLOAD_FOLDER"] = os.getcwd() + "/uploads"
+    if os.environ.get("ENVIRONMENT") == "dev":
+        app_settings = "config.DevelopmentConfig.DevelopmentConfig"
+    elif os.environ.get('ENVIRONMENT') == 'ci':
+        app_settings = "config.CiConfig.CiConfig"
+    elif os.environ.get('ENVIRONMENT') == 'test':
+        app_settings = "config.TestConfig.TestConfig"
+    elif os.environ.get("ENVIRONMENT") == "prod":
+        app_settings = "config.ProductionConfig.ProductionConfig"
+
+    app.config.from_object(app_settings)
 
     if not os.path.isdir(app.config["UPLOAD_FOLDER"]):
         os.makedirs(app.config["UPLOAD_FOLDER"])
-
-    # Uploads settings
-    app.config["UPLOADED_FILE_DEST"] = os.getcwd() + "/uploads"
 
     csrf.init_app(app)
     db.init_app(app)
