@@ -3,7 +3,7 @@ services:
     name: donordash
     env: python
     buildCommand: pip install -r pip.txt
-    startCommand: gunicorn run:app --bind 0.0.0.0:$PORT
+    startCommand: gunicorn "donordash:create_app()" --bind 0.0.0.0:$PORT
     envVars:
       - key: FLASK_APP
         value: run.py
