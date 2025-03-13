@@ -4,23 +4,20 @@ import csv
 import os
 import uuid
 
-from flask import current_app, jsonify, request
-from flask_classful import FlaskView, route
+from flask import current_app, request
+from flask_restx import Namespace, Resource
 
-from donordash import csrf, mail
+from donordash import mail
 from donordash.lib.helpers import send_email
 from donordash.models.donation import Donation
 from donordash.models.donationfile import DonationFile
 
-__all__ = "ApiView"
+donations_ns = Namespace("Donations", description="View donations")
 
 
-class ApiView(FlaskView):
-    route_base = "/api"
-
-    @route("/donations", methods=["GET"])
-    def donations(self):
-        """Get all donation records."""
+@donations_ns.route("")
+class Donations(Resource):
+    def get(self):
         donations = Donation.query.all()
         donations_dicts = []
         for donation in donations:
@@ -35,11 +32,15 @@ class ApiView(FlaskView):
                     "anonymous": donation.anonymous,
                 }
             )
-        return jsonify(donations_dicts)
+        return donations_dicts
 
-    @route("/process_donations", methods=["POST"])
-    @csrf.exempt
-    def process_donations(self):
+
+process_donations_ns = Namespace("Process Donations", description="Process donations")
+
+
+@process_donations_ns.route("")
+class ProcessDonations(Resource):
+    def post(self):
         """Process all donation records."""
         unprocessed_files = DonationFile.query.filter_by(processed=False).all()
 
@@ -115,11 +116,16 @@ class ApiView(FlaskView):
                 unprocessed_file.processed = True
                 unprocessed_file.save()
 
-        return jsonify({"Success": "Donations processed"})
+        return {"Success": "Donations processed"}
 
-    @route("/upload", methods=["GET", "POST"])
-    @csrf.exempt
-    def upload(self):
+
+upload_donations_ns = Namespace("Upload Donations", description="Upload donations")
+
+
+@upload_donations_ns.route("")
+class UploadDonations(Resource):
+    # @route("/upload", methods=["GET", "POST"])
+    def post(self):
         """Upload new CSV file and process it."""
 
         if request.files.get("donation_file"):
@@ -143,6 +149,6 @@ class ApiView(FlaskView):
                 donation_file.email = email_address
             donation_file.save()
 
-            return jsonify({"Success": "File uploaded"})
+            return {"Success": "File uploaded"}, 200
 
-        return jsonify(error=400, exception="File not uploaded"), 400
+        return {"error": 400, "exception": "File not uploaded"}, 400

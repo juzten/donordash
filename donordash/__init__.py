@@ -10,10 +10,8 @@ from flask import Flask
 from flask_cors import CORS
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_mail import Mail
+from flask_restx import Api
 from flask_sqlalchemy import SQLAlchemy
-
-# from flask_marshmallow import Marshmallow
-from flask_wtf.csrf import CSRFProtect
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -21,7 +19,9 @@ requests.packages.urllib3.disable_warnings()
 
 db = SQLAlchemy()
 mail = Mail()
-csrf = CSRFProtect()
+api = Api(
+    doc="/docs",
+)
 
 
 def create_app(environment=None):
@@ -49,7 +49,6 @@ def create_app(environment=None):
     if not os.path.isdir(app.config["UPLOAD_FOLDER"]):
         os.makedirs(app.config["UPLOAD_FOLDER"])
 
-    csrf.init_app(app)
     db.init_app(app)
     mail.init_app(app)
     # ma = Marshmallow(app)
@@ -72,5 +71,17 @@ def create_app(environment=None):
     from donordash.views import init_views  # noqa: E402
 
     init_views(app)
+
+    from donordash.views.api import (
+        donations_ns,
+        process_donations_ns,
+        upload_donations_ns,
+    )
+
+    api.add_namespace(donations_ns, path="/api/donations")
+    api.add_namespace(process_donations_ns, path="/api/process_donations")
+    api.add_namespace(upload_donations_ns, path="/api/upload")
+
+    api.init_app(app)
 
     return app

@@ -3,14 +3,12 @@
 from flask import render_template
 
 from donordash import db
-from donordash.views.api import ApiView
 
 __all__ = "init_views"
 
 
 def init_views(app):
     register_error_handlers(app)
-    ApiView.register(app)
 
 
 def register_error_handlers(app=None):
