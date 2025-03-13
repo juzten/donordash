@@ -15,9 +15,6 @@ def send_async_email(app, msg):
 
 def send_email(to, subject, template, **kwargs):
     with current_app.app_context():
-
-        logging_on = current_app.config.LOGGING_ON
-        print_log = current_app.config.PRINTLOG
         if not current_app.config.NOTIFICATIONS_ON:
             return
         #    if kwargs.get('sender'):
@@ -27,7 +24,7 @@ def send_email(to, subject, template, **kwargs):
 
         try:
             msg = Message(
-                config.MAIL_SUBJECT_PREFIX + " " + subject,
+                current_app.config.MAIL_SUBJECT_PREFIX + " " + subject,
                 sender=sender,
                 recipients=to,
                 bcc=[current_app.config.CATCH_ALL_EMAIL_ADDRESS],

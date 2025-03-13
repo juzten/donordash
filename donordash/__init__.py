@@ -5,17 +5,15 @@ import os
 import warnings
 
 import requests.packages.urllib3
+from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
-from dotenv import load_dotenv
 
 # from flask_marshmallow import Marshmallow
 from flask_wtf.csrf import CSRFProtect
-
-from config import config
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -39,9 +37,9 @@ def create_app(environment=None):
 
     if os.environ.get("ENVIRONMENT") == "dev":
         app_settings = "config.DevelopmentConfig.DevelopmentConfig"
-    elif os.environ.get('ENVIRONMENT') == 'ci':
+    elif os.environ.get("ENVIRONMENT") == "ci":
         app_settings = "config.CiConfig.CiConfig"
-    elif os.environ.get('ENVIRONMENT') == 'test':
+    elif os.environ.get("ENVIRONMENT") == "test":
         app_settings = "config.TestConfig.TestConfig"
     elif os.environ.get("ENVIRONMENT") == "prod":
         app_settings = "config.ProductionConfig.ProductionConfig"
