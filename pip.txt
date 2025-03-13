@@ -24,3 +24,4 @@ flake8==6.1.0
 gunicorn==21.2.0
 dotenv
 flask-restx==1.3.0
+Flask-Cors==3.0.10
