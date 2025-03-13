@@ -4,6 +4,9 @@ import os
 class CiConfig(BaseConfig):
     APP_SECRET_KEY = "asdfdsafdsafdsfa"
     DATABASE_URI = 'postgresql://postgres:password@postgres:5432/donor_app_test'
+    PROPAGATE_EXCEPTIONS = True
+    SQLALCHEMY_DATABASE_URI = DATABASE_URI
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     DISABLE_CSRF = True
     LOG_LEVEL = 'INFO'
     PORT = 5000
